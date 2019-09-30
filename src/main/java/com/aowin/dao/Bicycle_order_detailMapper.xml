@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 采购明细Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_order_detailDao">
+	<!-- 新增采购明细单 -->
+	<insert id="addBicycle_order_detail">
+		insert into bicycle_order_detail(catagory_id,order_id,bicycle_id,create_date,batch_no,price,remark) 
+		values 
+		<foreach collection="bicycle_infoList"  item="item" separator=",">
+			(#{catagory_id},#{order_id},#{item.bicycle_id},#{create_date},#{batch_no},#{price},#{remark})
+		</foreach>
+	</insert>	
+	<!-- 查询某一采购主单的车辆编号List -->
+	<select id="getBicycle_codeListByOrder_id" resultType="long">
+		select bicycle_code 
+		from bicycle_order_detail d,bicycle_info i
+		where order_id = #{order_id} and d.bicycle_id = i.bicycle_id
+	</select>
+	<!-- 更新明细单 -->
+	<update id="updateBicycle_order_detail">
+		update bicycle_order_detail 
+		set catagory_id = #{catagory_id},batch_no = #{batch_no},price = #{price}, remark = #{remark}
+		where order_id = #{order_id}
+	</update>
+</mapper>

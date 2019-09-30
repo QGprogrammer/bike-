@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 车辆信息Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_infoDao">
+	<!-- 查询最大车辆编号 -->
+	<select id="getMaxBicycleCode" resultType="string">
+		select
+		ifnull(max(bicycle_code),0) from bicycle_info
+	</select>
+	<!-- 新增车辆信息 -->
+	<insert id="addBicycle_info" useGeneratedKeys="true"
+		keyProperty="bicycle_id">
+		insert into bicycle_info(bicycle_code,status,user_id,operator_time)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.bicycle_code},#{item.status},#{item.user_id},#{item.operator_time})
+		</foreach>
+	</insert>
+	<!-- 带状态查询车辆id和车辆编号 -->
+	<select id="getBicycle_infoByStatus" resultType="Bicycle_info">
+		select bicycle_id,bicycle_code from bicycle_info
+		<where>
+			<if test="_parameter != null">
+				status = #{status}
+			</if>
+		</where>
+	</select>
+	<!-- 车辆批量入桩 -->
+	<update id="updateBicycle_infoByInstation">
+		update Bicycle_info
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="STATUS =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+						when bicycle_id=#{i.bicycle_id} then '3'
+				</foreach>
+			</trim>
+			<trim prefix="pile_id =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.pile_id!=null">
+						when bicycle_id=#{i.bicycle_id} then #{i.pile_id}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		where
+		<foreach collection="list" separator="or" item="i"
+			index="index">
+			bicycle_id=#{i.bicycle_id}
+		</foreach>
+	</update>
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 采购主单Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_orderDao">
+	<!-- 新增采购主单 -->
+	<insert id="addBicycle_order" useGeneratedKeys="true" keyProperty="order_id">
+		insert into bicycle_order(order_code,vender_id,buy_date,buy_num,buy_price,person_in_charge,invoice_no,user_id,operator_time,remark) 
+		values(#{order_code},#{vender_id},#{buy_date},#{buy_num},#{buy_price},#{person_in_charge},#{invoice_no},#{user_id},#{operator_time},#{remark})
+	</insert>	
+	<!-- 查询采购主单 -->
+	<select id="getBicycle_orderList" resultType="Bicycle_order">
+		select order_id,order_code,buy_date,buy_num,buy_price,person_in_charge
+		from bicycle_order
+	</select>
+</mapper>

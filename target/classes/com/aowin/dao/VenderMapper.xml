@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 供应商Dao的映射 -->
+<mapper namespace="com.aowin.dao.VenderDao">
+	<!-- 供应商List -->
+	<select id="getVenderList" resultType="Vender">
+		select vender_id,vender_name from vender
+	</select>
+		
+</mapper>

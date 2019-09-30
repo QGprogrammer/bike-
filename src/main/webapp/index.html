@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<!-- <meta name="author" content=""> -->
+
+<title>自行车系统</title>
+
+<!-- Bootstrap Core CSS -->
+<link href="/bike/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- MetisMenu CSS -->
+<link href="/bike/css/metisMenu.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="/bike/css/sb-admin-2.min.css" rel="stylesheet">
+
+<!-- Custom Fonts -->
+<link href="/bike/css/font-awesome/css/font-awesome.min.css"
+	rel="stylesheet" type="text/css">
+
+<!-- jQuery -->
+<script src="/bike/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/bike/js/bootstrap.min.js"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="/bike/js/metisMenu.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/bike/js/sb-admin-2.min.js"></script>
+<script type="text/javascript" src="/bike/js/vue.min.js"></script>
+<script type="text/javascript" src="/bike/js/vue-resource.min.js"></script>
+<script type="text/javascript" src="/bike/js/common.js"></script>
+<script src="/bike/js/laydate/laydate.js"></script>
+<script src = "http://api.map.baidu.com/api?v=2.0&ak=Ikd2A16tuZY9jviM4wRNkO2Tu3DT5lwK"></script>
+<style>
+.public-header-login, .public-header-logout {
+	display: inline;
+	color: #fefefe;
+	padding: 8px;
+	border-radius: 8px;
+}
+
+.public-header-login {
+	background: #a5cf4c;
+}
+
+.public-header-logout {
+	background: #52afb7;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<nav class="navbar navbar-default navbar-static-top" role="navigation"
+			style="margin-bottom: 0">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="index.html">自行车系统</a>
+				<div id="loginAndLogout"
+					style="position: absolute; right: 20px; top: 20px; width: 300px">
+					<span>{{message}}</span> <a href='javascript:void(0)'
+						class='public-header-login' @click="load('/bike/login.html')">登录</a> <a
+						href='javascript:void(0)' class='public-header-logout'
+						@click='logout()'>安全退出</a>
+				</div>
+			</div>
+			<div class="navbar-default sidebar" role="navigation">
+				<div class="sidebar-nav navbar-collapse">
+					<ul class="nav" id="side-menu">
+						<li><a href="#"><i class="fa fa-cog fa-fw"></i>组织机构管理<span
+								class="fa arrow"></span></a>
+							<ul class="nav nav-second-level">
+								<li>
+									<!-- msphase/phase.html --> <a href="javascript:void(0)"
+									@click="load('/bike/organization/phase/phase.html')">权限管理</a>
+								</li>
+								<li><a href="javascript:void(0)"
+									@click="load('/bike/organization/syrole/syrole.html')">角色管理</a></li>
+								<li><a href="javascript:void(0)"
+									@click="load('/bike/organization/user/user.html')">人员管理</a></li>
+							</ul> <!-- /.nav-second-level --></li>
+						<li><a href="#"><i class="fa fa-angle-double-right fa-fw"></i>业务信息管理<span
+								class="fa arrow"></span></a>
+							<ul class="nav nav-second-level">
+								<li><a href="#">供应商管理</a></li>
+								<li><a href="#">办卡</a></li>
+								<li><a href="#">充值</a></li>
+								<li><a href="#">车点车桩管理</a></li>
+								<li><a href="#">车辆类型管理</a></li>
+
+							</ul> <!-- /.nav-second-level --></li>
+						<li><a href="#"><i class="fa fa-cog fa-fw"></i>车辆业务<span
+								class="fa arrow"></span></a>
+							<ul class="nav nav-second-level">
+								<li><a href="rent.html">车辆租还业务</a></li>
+								<li><a href="#">车辆维修业务</a></li>
+								<li><a href="#">车辆调度业务</a></li>
+							</ul> <!-- /.nav-second-level --></li>
+						<li><a href="#"><i class="fa fa-truck fa-fw"></i>车辆业务管理<span
+								class="fa arrow"></span></a>
+							<ul class="nav nav-second-level">
+								<li><a href="javascript:void(0)" @click="load('/bike/bicyclemanager/order/order.html')">车辆购入登记</a></li>
+								<li><a href="javascript:void(0)" @click="load('/bike/bicyclemanager/b_instation/b_instation.html')">新车入桩登记</a></li>
+								<li><a href="#">维修登记</a></li>
+								<li><a href="#">报废登记</a></li>
+
+							</ul></li>
+						<li><a href="#"><i class="fa  fa-rmb fa-fw"></i>统计报表<span
+								class="fa arrow"></span></a>
+							<ul class="nav nav-second-level">
+								<li><a href="javascript:void(0)" @click="load('/bike/information_search/station_bicycles_search.html')">车点车辆统计</a></li>
+								<li><a href="#">车点使用率统计</a></li>
+								<li><a href="#">实时卡费用统计</a></li>
+								<li><a href="#">月度年度车辆费用统计</a></li>
+								<li><a href="#">月度年度卡费用统计</a></li>
+
+							</ul></li>
+					</ul>
+				</div>
+
+			</div>
+
+		</nav>
+	</div>
+	<div id="page-wrapper">
+		<div class="row">
+			<img alt="" src="images/first.jpg">
+			<h1>欢迎使用杭州公共自行车系统</h1>
+			<p style="color: red; font-size: 18px;">
+				使用说明：<br /> 点击左侧车辆业务菜单，选择您需要的业务吧
+			</p>
+		</div>
+	</div>
+
+	<!-- /#wrapper -->
+
+	<script type="text/javascript">
+	var vm = new Vue({
+	    el : "#wrapper",
+	    data : {
+		message : '您好,请先登录！'
+	    },
+	    methods : {
+		load : function(url) {
+		    $("#page-wrapper").load(url);
+		},
+		logout : function() {
+		    sessionStorage.removeItem("syUser");
+		    location.href = "/bike/loginAndOut/logout.do";
+		}
+	    },
+	    mounted : function() {
+		if (sessionStorage.getItem("syUser") != null) {
+		    var syUser = JSON.parse(sessionStorage.getItem("syUser"));
+		    this.message = syUser.username + ",您好呀！";
+		} else {
+		    this.message = '您好,请先登录！';
+		}
+		this.$http.get("/bike/loginAndOut/getAllMsPhase.do").then(
+			(resp)=>{});
+	    },
+	});
+    </script>
+</body>
+</html>

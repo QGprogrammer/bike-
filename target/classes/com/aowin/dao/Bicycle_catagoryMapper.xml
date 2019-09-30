@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 车辆类型Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_catagoryDao">
+	<!-- 查询全部类型信息 -->
+	<select id="getBicycle_catagoryList" resultType="Bicycle_catagory">
+		select catagory_id,catagory_name 
+		from bicycle_catagory 
+	</select>
+	<!-- 根据车辆id查询车辆信息 -->
+	<select id="getBicycle_catagoryById" resultType="Bicycle_catagory">
+		select bicycle_code,c.catagory_name,frame_type,TIRE_TYPE,weight,height,length,ring_type,basket,backseat,bicycle_seat,handbrake
+		from bicycle_info i,bicycle_catagory c,bicycle_order_detail d
+		where d.catagory_id = c.catagory_id and d.bicycle_id = i.bicycle_id
+		and d.bicycle_id = #{bicycle_id}
+ 	</select>
+</mapper>

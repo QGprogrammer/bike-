@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 车桩Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_pileDao">
+	<!-- 查询某站点车桩集合 -->
+	<select id="getBicycle_pileListByStationId" resultType="Bicycle_pile">
+		select pile_code,station_id,pile_id
+		from bicycle_pile
+		where status = #{status} and station_id = #{station_id}
+	</select>
+	<!-- 更新车桩的状态 新车入桩 -->
+	<update id="updateBicycle_pileStatus">
+		update bicycle_pile
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="STATUS =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+						when pile_id=#{i.pile_id} then '1'
+				</foreach>
+			</trim>
+			<trim prefix="bicycle_id =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					when pile_id=#{i.pile_id} then #{i.bicycle_id}
+				</foreach>
+			</trim>
+		</trim>
+		where
+		<foreach collection="list" separator="or" item="i"
+			index="index">
+			pile_id = #{i.pile_id}
+		</foreach>
+	</update>
+	<!-- 根据车点经纬度查询车桩信息 -->
+	<select id="getBicycle_pileListByLogAndLat" resultType="Bicycle_pile">
+		select pile_id,pile_code,bicycle_id,station_name 
+		from bicycle_station s,bicycle_pile p
+		where s.station_id = p.station_id
+		and longitude = #{longitude} and latitude = #{latitude}
+	</select>
+</mapper>

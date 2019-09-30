@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="describe" content="">
+<meta name="author" content="">
+
+<title>车点车辆信息查询</title>
+
+<!-- Bootstrap Core CSS -->
+<link href="/bike/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- MetisMenu CSS -->
+<link href="/bike/css/metisMenu.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="/bike/css/sb-admin-2.min.css" rel="stylesheet">
+
+<!-- Custom Fonts -->
+<link href="/bike/css/font-awesome/css/font-awesome.min.css"
+	rel="stylesheet" type="text/css">
+
+<!-- jQuery -->
+<script src="/bike/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/bike/js/bootstrap.min.js"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="/bike/js/metisMenu.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/bike/js/sb-admin-2.min.js"></script>
+
+<script type="text/javascript" src="/bike/js/vue.min.js"></script>
+<script type="text/javascript" src="/bike/js/vue-resource.min.js"></script>
+<script type="text/javascript" src="/bike/js/common.js"></script>
+<script type="text/javascript"
+	src="/bike/information_search/station_bicycles_search_js.js"></script>
+
+</head>
+
+<body>
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">车点车辆信息查询</h1>
+		</div>
+	</div>
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div id="station">
+				<div class="panel-heading">车点联合查询</div>
+				<div id="dataTables-example_wrapper"
+						class="dataTables_wrapper form-inline dt-bootstrap no-footer" style="margin-left:20px">
+				<div id="dataTables-example_filter" class="dataTables_filter">
+				<label> 车点名称: <input type="text" v-model.trim.lazy="station_name"
+					class="form-control input-sm" aria-controls="dataTables-example"></label>
+				<label> 车点地址： <input type="text"
+					v-model.trim.lazy="address" class="form-control input-sm"
+					aria-controls="dataTables-example">
+				</label>
+				<button type="button" class="btn btn-info" @click="search()">查询</button>
+				</div>
+				</div>
+				<!-- /.panel-heading -->
+				<div class="panel-body">
+					<div id="dataTables-example_wrapper"
+						class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+						<div id="container" style="width: 800px; height: 400px;"></div>
+					</div>
+				</div>
+			</div>
+			<!-- 车点的车桩信息 -->
+			<div id="station_pile" style="display: none">
+			<div class="panel-heading">【{{station_name}}】车桩分布信息</div>
+				<table width="100%"
+					class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+					role="grid" aria-describedby="dataTables-example_info"
+					style="width: 100%; text-align:center">
+					<tbody>
+						<div width=800px height=600px style="background-color: blanchedalmond">
+							<div class="pile" v-for="item in station_pileList"  style="text-align:center"><br/><p>车桩号：{{item.pile_code}}</p><p v-if="item.bicycle_id != null"><input type="button" value="车辆详情" @click="getBicycle_info(item.bicycle_id)"></p></div>
+						</div>
+					</tbody>
+				</table>
+				<button type="button" class="btn btn-info" @click="back()">返回</button>
+			</div>
+		</div>
+	</div>
+</body>
+<style>
+	.pile{
+		float: left;
+		margin-left: 20px;
+		width:90px;
+		height:120px;
+		background-color: aliceblue;
+		border: 2px salmon dashed;
+	}
+
+</style>
+</html>

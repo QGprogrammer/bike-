@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="describe" content="">
+<meta name="author" content="">
+
+<title>车辆业务管理</title>
+<script type="text/javascript"
+	src="/bike/bicyclemanager/order/order_js.js"></script>
+</head>
+
+<body>
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">车辆购入</h1>
+		</div>
+	</div>
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div id="order">
+				<div class="panel-heading">车辆购入主单列表</div>
+				<!-- /.panel-heading -->
+				<div class="panel-body">
+					<div id="dataTables-example_wrapper"
+						class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+						<div class="col-sm-12">
+							<div id="dataTables-example_filter" class="dataTables_filter">
+								<button type="button" class="btn btn-info" onclick="addShow()">新增</button>
+							</div>
+						</div>
+						<div class="col-sm-12">
+							<table width="100%"
+								class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+								role="grid" aria-describedby="dataTables-example_info"
+								style="width: 100%; text-align:center">
+								<thead>
+									<tr role="row">
+										<th>采购单号</th>
+										<th>购买日期</th>
+										<th>购买数量</th>
+										<th>购买价格</th>
+										<th>负责人</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(item,index) in orderList"
+										:class="{gradeA:true,even:index%2==0,odd:index%2==1}"
+										role="row">
+										<td class="sorting_1">{{item.order_code}}</td>
+										<td>{{item.buy_date}}</td>
+										<td>{{item.buy_num}}</td>
+										<td>{{item.buy_price}}</td>
+										<td>{{item.person_in_charge}}</td>
+										<td>
+											<input type="button" value="增加明细"
+												class="btn btn-info btn-square" @click="addDetailShow(item.order_id)">
+											</input>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 新增 -->
+			 <div id="addOrder" style="display: none">
+			<div class="panel-heading">车辆采购主单新增</div>
+				<table width="100%"
+					class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+					role="grid" aria-describedby="dataTables-example_info"
+					style="width: 100%; text-align:center">
+					<thead>
+						<tr role="row">
+							<th colspan=2>采购主单信息</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="text-align:right">供应商：</td>
+							<td>
+								<select v-model="order.vender_id">
+									<option v-for="vender in venderList" :value="vender.vender_id">{{vender.vender_name}}</option>
+								</select>
+							</td>
+						</tr>
+						<tr><td style="text-align:right">购买数量:</td><td><div style="width:300px;margin:auto">{{order.buy_num}}<input v-model="order.buy_num" type="range" min="1" max="50"></div></td></tr>
+						<tr><td style="text-align:right">购买价格:</td><td><input type="text" v-model="order.buy_price"></td></tr>
+						<tr><td style="text-align:right">购买日期:</td><td><input type="text" placeholder="请选择日期" id="tim5" @click="layShow()" v-model="order.buy_date"></td>						
+						</tr>
+						<tr><td style="text-align:right">发票代码:</td><td><input type="text" v-model="order.invoice_no"></td></tr>
+						<tr><td style="text-align:right">负责人:</td><td><input type="text" v-model="order.person_in_charge"></td></tr>
+						<tr><td style="text-align:right">备注:</td><td><input type="text" v-model="order.remark"></td></tr>
+						<tr role="row">
+							<td colspan='2'><input type="button" class="btn btn-info btn-square"
+								value="提交" @click="submit()" />&nbsp;&nbsp;<input type="button" class="btn btn-warning btn-square"
+								value="重置" @click="clear()" /></td>
+						</tr>
+					</tbody>
+				</table>
+				<button type="button" class="btn btn-info" onclick="back()">返回</button>
+			</div> 
+			<!-- 新增明细 -->
+			 <div id="addDetail" style="display: none">
+			<div class="panel-heading">车辆采购明细单新增</div>
+				<table width="100%"
+					class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+					role="grid" aria-describedby="dataTables-example_info"
+					style="width: 100%; text-align:center">
+					<thead>
+						<tr role="row">
+							<th colspan=2>采购明细单信息</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="text-align:right">自行车类型：</td>
+							<td>
+								<select v-model="detail.catagory_id">
+									<option v-for="item in bicycle_catagoryList" :value="item.catagory_id">{{item.catagory_name}}</option>
+								</select>
+							</td>
+						</tr>
+						<tr><td style="text-align:right">自行车编号列表:</td><td>
+							<select>
+								<option v-for="item in bicycle_codeList">{{item}}</option>								
+							</select>
+						</td></tr>
+						<tr><td style="text-align:right">批次号:</td><td><input type="text" v-model="detail.batch_no"></td></tr>
+						<tr><td style="text-align:right">自行车单价:</td><td><input type="text" v-model="detail.price"></td></tr>
+						<tr><td style="text-align:right">备注:</td><td><input type="text" v-model="detail.remark"></td></tr>
+						<tr role="row">
+							<td colspan='2'><input type="button" class="btn btn-info btn-square"
+								value="提交" @click="submit()" />&nbsp;&nbsp;<input type="button" class="btn btn-warning btn-square"
+								value="重置" @click="clear()" /></td>
+						</tr>
+					</tbody>
+				</table>
+				<button type="button" class="btn btn-info" onclick="back()">返回</button>
+			</div> 
+		</div>
+	</div>
+</body>
+</html>

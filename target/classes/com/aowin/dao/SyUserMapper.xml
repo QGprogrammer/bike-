@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 用户Dao的映射 -->
+<mapper namespace="com.aowin.dao.SyUserDao">
+	<!-- 登录校验 -->
+	<select id="checkSyUser" resultType="SyUser">
+		select user_id,role_id,username 
+		from syuser
+		where login_name = #{login_name} and password = #{password} and zxbj = 0
+	</select>
+	<!-- 模糊查询得用户List -->
+	<select id="getSyUserList" resultType="SyUser">
+		select u.user_id,u.username,u.role_id,u.login_name,u.office_phone,u.mobile_phone,u.email,u.zxbj,r.role_describe
+		from syrole r right join syuser u on r.role_id = u.role_id
+		<where>
+			<if test="username != null and username != ''">
+				and username like concat('%',#{username},'%')
+			</if>
+			<if test="office_phone != null and office_phone != ''">
+				and u.office_phone like concat('%',#{office_phone},'%')
+			</if>
+			<if test="mobile_phone != null and mobile_phone != ''">
+				and u.mobile_phone like concat('%',#{mobile_phone},'%')
+			</if>
+			<if test="email != null and email != ''">
+				and u.email like concat('%',#{email},'%')
+			</if>
+			<if test="zxbj != null">
+				and u.zxbj = #{zxbj}
+			</if>
+			<if test="role_id != null">
+				and u.role_id = #{role_id}
+			</if>
+		</where>
+	</select>
+	<!-- 新增用户 -->
+	<insert id="addSyUser">
+		insert into syuser(login_name,username,role_id,password,office_phone,mobile_phone,email,zxbj)
+		values(#{login_name},#{username},#{role_id},#{password},#{office_phone},#{mobile_phone},#{email},#{zxbj})
+	</insert>
+	<!-- 登录名校验 -->
+	<select id="checkLogin_name" resultType="SyUser">
+		select login_name from syuser 
+		where login_name = #{login_name}
+	</select>
+	<!-- 注销用户 -->
+	<update id="cancelSyUser">
+		update syuser set zxbj = 1 
+		where user_id = #{user_id}
+	</update>
+	<!-- 查询用户信息 -->
+	<select id="getSyUser" resultType="SyUser">
+		select username,office_phone,mobile_phone,email,zxbj,role_id
+		from syuser
+		where user_id = #{user_id}
+	</select>
+	<!-- 修改用户信息 -->
+	<update id="updateSyUser">
+		update syuser 
+		<set>
+			<if test="username != null and username != ''">
+				username = #{username},
+			</if>
+			<if test="password != null and password != ''">
+				password = #{password},
+			</if>
+			<if test="office_phone != null and office_phone != ''">
+				office_phone = #{office_phone},
+			</if>
+			<if test="mobile_phone != null and mobile_phone != ''">
+				mobile_phone = #{mobile_phone},
+			</if>
+			<if test="email != null and email != ''">
+				email = #{email},
+			</if>
+			<if test="zxbj != null">
+				zxbj = #{zxbj},
+			</if>
+			<if test="role_id != ''">
+				role_id = #{role_id},
+			</if>
+		</set>
+		where user_id = #{user_id}
+	</update>
+	<!-- 删除角色判断 查看用户表中某角色id的条数 一条即可 -->
+	<select id="getRoleCountBySyUser" resultType="int">
+		select count(DISTINCT role_id) from syuser where role_id = #{role_id}
+	</select>
+</mapper>

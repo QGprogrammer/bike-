@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 角色Dao的映射 -->
+<mapper namespace="com.aowin.dao.SyRoleDao">
+	<!-- resultmap model一对多关系映射 -->
+	<resultMap type="SyRole" id="syRoleMap">
+		<id column="roleid" property="role_id"/>
+		<collection property="msPhaseList" ofType="MsPhase">
+			<id column="phaseid" property="phaseid"/>
+			<result column="url" property="url"/>
+		</collection>
+	</resultMap>
+	<!-- resultmap syrole\sypermission\mspahse -->
+	<resultMap type="SyRole" id="syRoleMapDetail">
+		<id column="role_id" property="role_id"/>
+		<result column="role_name" property="role_name"/>
+		<result column="role_describe" property="role_describe"/>
+		<collection property="msPhaseList" ofType="MsPhase">
+			<id column="phaseid" property="phaseid"/>
+			<result column="description" property="description"/>
+		</collection>
+	</resultMap>
+	<!-- 查询某个角色的授权信息 -->
+	<select id="getRoleSyPermission" resultMap="syRoleMap">
+		select s.roleid,s.phaseid,m.url 
+		from msphase m,sypermission s
+		where s.phaseid = m.phaseid and s.roleid = #{roleid}
+	</select>
+	<!-- 模糊查询角色信息List -->
+	<select id="getSyRoleList" resultMap="syRoleMapDetail">
+		select x.role_id,x.role_name,x.role_describe,x.phaseid,m.description
+		from 
+			(select m.phaseid,s.role_id,s.role_name,s.role_describe 
+			from sypermission m  
+			right join syrole s 
+			on  s.role_id = m.roleid) x 
+		left join msphase m
+		on x.PHASEID = m.PHASEID
+		<where>
+			<if test="role_name != null and role_name != ''">
+				and role_name like concat('%',#{role_name},'%')
+			</if>
+			<if test="role_describe != null and role_describe != ''">
+				and role_describe like concat('%',#{role_describe},'%')
+			</if>
+		</where>
+	</select>
+	<!-- 查询某个角色的全部信息 -->
+	<select id="getSyRole" resultMap="syRoleMapDetail">
+		select s.role_id,s.role_name,s.role_describe,m.phaseid,m.description
+		from sypermission p INNER JOIN msphase m on  p.phaseid = m.phaseid
+		right join syrole s on s.role_id = p.roleid 
+		where s.role_id = #{role_id}
+	</select>
+	<!-- 更新某个角色的基本信息 -->
+	<update id="updateSyRole">
+		update syrole 
+		<set>
+			<if test="role_name != null and role_name != ''">
+				role_name = #{role_name},
+			</if>
+			<if test="role_describe != null and role_describe != ''">
+				role_describe = #{role_describe},
+			</if>
+		</set>
+		where role_id = #{role_id}
+	</update>
+	<!-- 新增角色基本信息 -->
+	<insert id="addSyRole" parameterType="SyRole" useGeneratedKeys="true" keyProperty="role_id">
+		insert into syrole(role_name,role_describe) values(#{role_name},#{role_describe})
+	</insert>
+	<!-- 校验角色是否存在 -->
+	<select id="checkSyRole" resultType="SyRole">
+		select role_name from syrole 
+		where role_name = #{role_name}
+	</select>
+	<!-- 删除角色 -->
+	<delete id="deleteSyRole">
+		delete from syrole 
+		where role_id = #{role_id}
+	</delete>
+</mapper>

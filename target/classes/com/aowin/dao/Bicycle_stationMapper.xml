@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 车辆站点Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_stationDao">
+	<!-- 查询站点信息 -->
+	<select id="getBicycle_stationList" resultType="Bicycle_station">
+		select station_id,station_name
+		from bicycle_station
+	</select>
+	<!-- 根据车点名称、地址模糊查询出详细信息（车点、车桩信息联合查询） -->
+	<select id="getBicycle_stationListByNameOrAdd" resultType="Bicycle_station">
+		select s.station_id,station_name,longitude,latitude,bicycle_pile_num,address,count(bicycle_id) as bicycle_num
+		from bicycle_station s left join bicycle_pile p on s.station_id = p.station_id
+		<where>
+			<if test="station_name !=null and station_name != ''">
+				 and station_name like concat('%',#{station_name},'%')
+			</if>
+			<if test="address !=null and address != ''">
+				 and address like concat('%',#{address},'%')
+			</if>
+		</where>
+		GROUP BY s.STATION_ID 
+	</select>
+</mapper>

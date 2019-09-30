@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 车辆调度Dao的映射 -->
+<mapper namespace="com.aowin.dao.Bicycle_deployDao">
+	<!-- 新增调度 新车入桩 -->
+	<insert id="addBicycle_deploy" useGeneratedKeys="true" keyProperty="deploy_id">
+		insert into bicycle_deploy(bicycle_id,to_pile_id,to_time,to_reason)
+		values
+		<foreach collection="list" item="item"  separator=",">
+			(#{item.bicycle_id},#{item.to_pile_id},#{item.to_time},#{item.to_reason})
+		</foreach>
+	</insert>
+</mapper>

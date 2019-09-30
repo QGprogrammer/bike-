@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        ">
+	<!-- 静态资源 -->
+	<mvc:default-servlet-handler />
+	<!-- 开启注解 -->
+	<mvc:annotation-driven />
+	<!-- 配置注解扫描 -->
+	<context:component-scan
+		base-package="com.aowin.controller"></context:component-scan>
+	<context:component-scan
+		base-package="com.aowin.service.impl"></context:component-scan>
+	<context:component-scan
+		base-package="com.aowin.util"></context:component-scan>
+	<!-- 引入jdbc配置文件 -->
+	<context:property-placeholder
+		location="classpath:jdbc.properties" />
+	<!-- 数据源信息 -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	<!-- transaction配置 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- sqlSessionFactory 可以配置原来mybatis下的很多属性 -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="typeAliasesPackage" value="com.aowin.model"></property>
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/aowin/dao/*Mapper.xml</value>
+			</list>
+		</property>
+		<property name="plugins" ref="pageHelper"></property>
+	</bean>
+	<!-- 分页插件 -->
+	<bean id="pageHelper"
+		class="com.github.pagehelper.PageInterceptor"></bean>
+	<!-- 生成所有mapper实例 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName"
+			value="sqlSessionFactory" />
+		<property name="basePackage" value="com.aowin.dao"></property>
+	</bean>
+	<!-- 开启事务注解驱动 -->
+	<tx:annotation-driven
+		transaction-manager="transactionManager" />
+	<!-- redis -->
+	<bean id="redisPool" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="300" />
+		<property name="maxTotal" value="600" />
+		<property name="maxWaitMillis" value="2000" />
+		<property name="testOnBorrow" value="true" />
+	</bean>
+	<bean id="connectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="127.0.0.1"></property>
+		<property name="port" value="6379"></property>
+		<property name="password" value=""></property>
+		<property name="poolConfig" ref="redisPool"></property>
+	</bean>
+	<!-- 序列化redis -->
+	<bean id="redisTemplate"
+		class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="keySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	<!-- 配置jms -->
+
+	<!-- 可以通过构造函数注入指定连接jms的路径，默认tcp://localhost:61616 -->
+	<bean id="targetConnectionFactory"
+		class="org.apache.activemq.ActiveMQConnectionFactory">
+		<constructor-arg index="0" value="tcp://127.0.0.1:61616"></constructor-arg>
+	</bean>
+	<bean id="jmsconnectionFactory"
+		class="org.springframework.jms.connection.SingleConnectionFactory">
+		<property name="targetConnectionFactory"
+			ref="targetConnectionFactory"></property>
+	</bean>
+	<!-- 目的地==》队列==》点对点的消息 -->
+	<bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg index="0" value="codequeue"></constructor-arg>
+	</bean>
+	<bean id="jmsTemplate"
+		class="org.springframework.jms.core.JmsTemplate">
+		<constructor-arg index="0" ref="jmsconnectionFactory"></constructor-arg>
+	</bean>
+
+	<!-- 消息监听器 -->
+	<bean id="codeListener" class="com.aowin.listener.CodeListener"></bean>
+
+	<!-- 绑定连接 目的地 监听器 -->
+	<bean
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsconnectionFactory"></property>
+		<property name="destination" ref="queue"></property>
+		<property name="messageListener" ref="codeListener"></property>
+	</bean>
+</beans>

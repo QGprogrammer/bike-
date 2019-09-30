@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
+<link rel="stylesheet" type="text/css" href="css/login.css" />
+<!-- <script type="text/javascript" src="js/jquery.js"></script> -->
+<script type="text/javascript" src="js/vue.min.js"></script>
+<script type="text/javascript" src="js/vue-resource.min.js"></script>
+<script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+<title>用户登录</title>
+</head>
+<body>
+	<div id="container">
+		<div id="bd">
+			<div id="main" style="position: absolute; top: 70px; left: 180px;">
+				<div class="login-box">
+					<div id="logo"></div>
+					<h1></h1>
+					<div class="input login_name">
+						<label for="login_name">用户名</label> <span></span> <input
+							type="text" id="login_name" autocomplete="off"
+							v-model="login_name" />
+					</div>
+					<div>
+						<span
+							style="color: red; font-size: 16px; position: absolute; top: 225px; left: 399px">{{errormes}}</span>
+					</div>
+					<div class="input psw" id="psw">
+						<label for="password">密&nbsp;&nbsp;&nbsp;&nbsp;码</label> <span></span>
+						<input type="password" id="password" v-model="password" />
+					</div>
+					<div class="input validate">
+						<label for="valiDate">手机验证</label> <input type="text"
+							v-model="phone" />
+						<div class="value">
+							<span 
+								style="color: white; font-size: 13px; font-weight: 600; display: block; margin-right: -23px"
+								@click="sendPhone()" id="TencentCaptcha" data-appid="1300279404" data-cbfn="callback">{{send}}</span>
+						</div>
+					</div>
+					<br />
+					<div class="input validate" id="validate">
+						<label for="valiDate">验证码</label> <input type="text" id="valiDate"
+							v-model="verify" />
+						<div class="value">
+							<img
+								style="width: 85px; height: 30px; position: absolute; left: -60px; top: -6px"
+								:src="imagesrc" @click="getVerifyCode()" />
+						</div>
+					</div>
+
+					<div id="btn" class="loginButton">
+						<input type="button" class="button" value="登录" @click="login()" style="color:white"/>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</body>
+<script type="text/javascript">
+var vm = new Vue({
+		el:"#main",
+		data:{
+			username:'',
+			password:'',
+			verify:'',
+			login_name:'',
+			errormes:'',
+			vimg : '',
+			imagesrc : '',
+			phone : '',
+			send : '',
+		},
+		methods:{
+			//登录
+			login:function(){
+				 if (this.verify == ''){
+					this.errormes = '请输入验证码！';
+				}else if (sessionStorage.getItem("syUser") != null){
+					alert("请先退出当前用户后再尝试登录！");
+				}else {
+					this.$http.post("/bike/loginAndOut/checkSyUser.do",{"password":this.password,"login_name":this.login_name,"verify":this.verify},{emulateJSON:true}).then(
+							(resp)=>{
+								if (resp.bodyText == 'noverify'){
+								    this.errormes = "验证码超时，请重新获取！";
+								}else if (resp.bodyText == 'errorverify'){
+								    this.errormes = "验证码错误，请重新输入！";
+								}else if (resp.bodyText == 'error'){
+									this.errormes = "账号或密码错，请重新输入！";
+								}else {
+									var syUser = JSON.stringify(resp.body);
+									sessionStorage.setItem("syUser",syUser);
+									this.username = syUser.username;
+									this.errormes = '';
+									this.send = "点击发送验证码";
+									location.href="index.html";
+								}
+							},(resp)=>{
+								
+							});
+						}
+				},
+				getVerifyCode : function(){
+				    this.$http.post("/bike/loginAndOut/verifyCode.do").then(
+					 	(resp)=>{
+					 	    //this.vimg = resp.bodyText;
+					 	    this.imagesrc = "data:image/png;base64,"+resp.bodyText;
+					 	},(resp)=>{
+					 	    
+					 	}   
+				    );
+				},
+				sendPhone : function(){
+				    var time = 30;
+				 	$("#phone").attr("disabled","disabled");
+				   	if (time != 0){
+					var t = setInterval(()=>{
+						this.send = time + "秒后再重试！";
+				   		time = time - 1;
+				   		if (time == 0){
+				   		    clearInterval(t);
+				   		 	this.send = "点击发送验证码";
+				   		}
+					    },1000);
+				    }
+				}
+		},
+		mounted : function(){
+		    this.send = "点击发送验证码";
+		    this.getVerifyCode();
+		}
+		
+	});
+	
+function callback(res){
+    console.log(res)
+    // res（用户主动关闭验证码）= {ret: 2, ticket: null}
+    // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+    if(res.ret === 0){
+	 $.get("/bike/loginAndOut/verifyPhoneCode.do",{phone:'13167569039'},function(data){
+	     alert(data);
+	 });
+    }
+   }
+</script>
+
+</html>

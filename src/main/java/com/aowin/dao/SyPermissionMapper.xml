@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 授权Dao的映射 -->
+<mapper namespace="com.aowin.dao.SyPermissionDao">
+	<!--查找授权表中对应的权限记录数（删除时判断）  -->
+	<select id="getMsPhaseCount" resultType="int">
+		select count(phaseid) from sypermission where phaseid = #{phaseid}
+	</select>	
+	<!-- 删除某角色的全部权限 -->
+	<delete id="deleteMsPhaseOfRole">
+		delete from sypermission where roleid = #{roleid}
+	</delete>
+	<!-- 为某角色分配权限 -->
+	<insert id="addMsPhaseOfRole">
+		insert into sypermission(roleid,phaseid) values
+		<foreach collection="msPhaseList"  item="item" separator=",">
+			(#{role_id},#{item.phaseid})
+		</foreach>
+	</insert>
+</mapper>
